@@ -4,10 +4,10 @@ An interactive, high-performance GIS Weather Station Dashboard for meteorologica
 
 ---
 
-## 🌟 Key Features
+##  Key Features
 
 1. **Live Weather Telemetry Engine**:
-   - Fetches live meteorological observations directly from Open-Meteo API in real-time.
+   - Fetches live meteorological observations directly from the Open-Meteo API in real time.
    - Live 60-second polling loop with automatic countdown timer and manual instant refresh.
    - Synchronized with PostgreSQL / PostGIS database via `weather_ingest.py`.
 
@@ -32,7 +32,7 @@ An interactive, high-performance GIS Weather Station Dashboard for meteorologica
 
 ---
 
-## 🚀 How to Run
+##  How to Run
 
 ### Method 1: Local HTTP Server (Recommended)
 
@@ -43,7 +43,7 @@ python -m http.server 8085 --directory "Dashboard"
 ```
 
 Then open your browser at:
-👉 **http://localhost:8085/index.html**
+ **http://localhost:8085/index.html**
 
 ### Method 2: Standalone File
 
@@ -51,7 +51,7 @@ Open `Dashboard/index.html` directly in your browser. All required dependencies 
 
 ---
 
-## 🔄 Live Ingestion & PostGIS Database Integration
+##  Live Ingestion & PostGIS Database Integration
 
 To continuously update your local PostgreSQL / PostGIS database:
 
