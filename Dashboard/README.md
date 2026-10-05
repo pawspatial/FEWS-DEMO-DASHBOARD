@@ -21,7 +21,7 @@ An interactive, high-performance GIS Weather Station Dashboard for meteorologica
 3. **Meteorological Reporting & Downloads**:
    - **Official Meteorological Station Bulletin**: Formatted telemetry report for each station.
    - **Download Formats**:
-     - **Print / PDF**: Professional formatted document ready for export or archiving (`window.print()`).
+   - **PDF**: Download the current station bulletin as a formatted PDF; uses the browser print dialog if PDF generation is unavailable.
      - **CSV**: Structured sensor data export (`.csv`).
      - **JSON**: Raw telemetry GeoJSON payload (`.json`).
      - **Full Network GeoJSON & CSV**: Bulk download of all monitored stations from header and analytics drawer.

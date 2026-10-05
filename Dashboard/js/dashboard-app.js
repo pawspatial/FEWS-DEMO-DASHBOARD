@@ -103,6 +103,17 @@ function setupEventListeners() {
     });
   }
 
+  // Map Layers Toggle
+  const toggleLayersBtn = document.getElementById("toggleLayersBtn");
+  const layersPanel = document.querySelector(".leaflet-control-layers");
+  if (toggleLayersBtn && layersPanel) {
+    toggleLayersBtn.addEventListener("click", () => {
+      const isOpen = layersPanel.classList.toggle("is-open");
+      toggleLayersBtn.classList.toggle("active", isOpen);
+      toggleLayersBtn.setAttribute("aria-expanded", String(isOpen));
+    });
+  }
+
   // Analytics Drawer Toggle
   const toggleAnalyticsBtn = document.getElementById("toggleAnalyticsBtn");
   const analyticsDrawer = document.getElementById("analyticsDrawer");
@@ -669,72 +680,13 @@ function renderStationCards(filteredStations = null) {
   container.innerHTML = list
     .map((st) => {
       const p = st.properties || {};
-      const coords = st.geometry.coordinates;
-      const temp =
-        p.temperature != null ? parseFloat(p.temperature).toFixed(1) : "--";
-      const feelsLike =
-        p.heat_index != null ? parseFloat(p.heat_index).toFixed(1) : temp;
-      const humidity =
-        p.humidity != null ? parseFloat(p.humidity).toFixed(0) : "--";
-      const windSpeed =
-        p.wind_speed != null ? parseFloat(p.wind_speed).toFixed(1) : "--";
-      const windDir =
-        p.wind_direction != null ? parseFloat(p.wind_direction).toFixed(0) : 0;
-      const pressure =
-        p.sea_level_pressure != null
-          ? parseFloat(p.sea_level_pressure).toFixed(0)
-          : p.pressure != null
-            ? parseFloat(p.pressure).toFixed(0)
-            : "--";
-      const rain =
-        p.rain_rate != null ? parseFloat(p.rain_rate).toFixed(1) : "0.0";
-
       const isActive =
         WeatherPulse.activeStationId === p.station_id ? "active" : "";
 
       return `
-      <div class="station-card ${isActive}" id="card-${p.station_id}" onclick="selectStation('${p.station_id}', true)">
-        <div class="st-card-header">
-          <div class="st-name-group">
-            <span class="st-card-title">${p.station_name || "Station"}</span>
-            <span class="st-card-id">${p.station_id}</span>
-          </div>
-          <div class="st-card-temp-hero">${temp}<span>°C</span></div>
-        </div>
-
-        <div class="st-card-grid">
-          <div class="st-metric-pill humidity">
-            <i class="fas fa-tint"></i>
-            <span class="st-metric-copy"><span class="st-metric-label">Humidity</span><span class="st-metric-val">${humidity}%</span></span>
-          </div>
-          <div class="st-metric-pill wind">
-            <i class="fas fa-wind"></i>
-            <span class="st-metric-copy"><span class="st-metric-label">Wind</span><span class="st-metric-val">${windSpeed} km/h <i class="fas fa-location-arrow st-compass-icon" style="transform: rotate(${windDir}deg);"></i></span></span>
-          </div>
-          <div class="st-metric-pill pressure">
-            <i class="fas fa-tachometer-alt"></i>
-            <span class="st-metric-copy"><span class="st-metric-label">Pressure</span><span class="st-metric-val">${pressure} hPa</span></span>
-          </div>
-          <div class="st-metric-pill rain">
-            <i class="fas fa-cloud-rain"></i>
-            <span class="st-metric-copy"><span class="st-metric-label">Rain</span><span class="st-metric-val">${rain} mm/h</span></span>
-          </div>
-          <div class="st-metric-pill feels-like">
-            <i class="fas fa-temperature-high"></i>
-            <span class="st-metric-copy"><span class="st-metric-label">Feels like</span><span class="st-metric-val">${feelsLike}°C</span></span>
-          </div>
-        </div>
-
-        <div class="st-card-footer">
-          <span><i class="fas fa-satellite"></i> GPS: ${coords[1].toFixed(2)}°, ${coords[0].toFixed(2)}°</span>
-          <div style="display: flex; align-items: center; gap: 8px;">
-            <button class="hud-btn" style="padding: 2px 8px; font-size: 10.5px; border-radius: 4px;" onclick="openStationReport('${p.station_id}', event)" title="View & Download official station report">
-              <i class="fas fa-file-invoice"></i> Report
-            </button>
-            <span><i class="far fa-clock"></i> ${formatTimestamp(p.last_updated)}</span>
-          </div>
-        </div>
-      </div>
+      <button type="button" class="station-card ${isActive}" id="card-${p.station_id}" aria-pressed="${Boolean(isActive)}" onclick="selectStation('${p.station_id}', true)">
+        <span class="st-card-title">${p.station_name || "Station"}</span>
+      </button>
     `;
     })
     .join("");
@@ -747,12 +699,13 @@ function selectStation(stationId, flyToMap = true) {
   WeatherPulse.activeStationId = stationId;
 
   // Highlight card
-  document
-    .querySelectorAll(".station-card")
-    .forEach((c) => c.classList.remove("active"));
+  document.querySelectorAll(".station-card").forEach((stationButton) => {
+    const isActive = stationButton.id === `card-${stationId}`;
+    stationButton.classList.toggle("active", isActive);
+    stationButton.setAttribute("aria-pressed", String(isActive));
+  });
   const card = document.getElementById(`card-${stationId}`);
   if (card) {
-    card.classList.add("active");
     card.scrollIntoView({ behavior: "smooth", block: "nearest" });
   }
 
@@ -1275,7 +1228,249 @@ function getCardinalDirection(deg) {
 }
 
 function printCurrentStationReport() {
-  window.print();
+  const feature = WeatherPulse.currentReportStation;
+  const PdfDocument = window.jspdf?.jsPDF;
+  if (!feature || !PdfDocument) {
+    window.print();
+    return;
+  }
+
+  try {
+    const props = feature.properties || {};
+    const coords = feature.geometry.coordinates;
+    const number = (value, digits = 1) => {
+      const parsed = Number(value);
+      return value != null && Number.isFinite(parsed)
+        ? parsed.toFixed(digits)
+        : "--";
+    };
+    const temperature = number(props.temperature);
+    const feelsLike = number(props.heat_index);
+    const humidity = number(props.humidity, 0);
+    const windSpeed = number(props.wind_speed);
+    const windGust = number(props.wind_gust);
+    const windDirection = number(props.wind_direction, 0);
+    const pressure = number(props.sea_level_pressure ?? props.pressure);
+    const rainRate = number(props.rain_rate);
+    const dewPoint = number(props.dew_point);
+    const observedAt = props.last_updated
+      ? new Date(props.last_updated).toLocaleString()
+      : new Date().toLocaleString();
+    const rainValue = parseFloat(rainRate);
+    const windValue = parseFloat(windGust);
+    const temperatureValue = parseFloat(temperature);
+    let advisory =
+      "Atmospheric conditions are within seasonal normal thresholds. No hazardous phenomena detected.";
+    if (rainValue > 1) {
+      advisory =
+        "ACTIVE PRECIPITATION ADVISORY: Significant rainfall detected. Monitor localized runoff.";
+    } else if (windValue > 35) {
+      advisory =
+        "HIGH WIND WATCH: Gusts exceed 35 km/h. Use caution around elevated structures.";
+    } else if (temperatureValue >= 32) {
+      advisory =
+        "ELEVATED THERMAL ADVISORY: High temperature and heat index. Hydration and shade are recommended.";
+    }
+
+    const phoneLayout = window.matchMedia("(max-width: 600px)").matches;
+    const doc = new PdfDocument({
+      orientation: "portrait",
+      unit: "mm",
+      format: phoneLayout ? "a5" : "a4",
+    });
+    const pageWidth = doc.internal.pageSize.getWidth();
+    const pageHeight = doc.internal.pageSize.getHeight();
+    const margin = phoneLayout ? 9 : 15;
+    const contentWidth = pageWidth - margin * 2;
+
+    doc.setFillColor(7, 16, 30);
+    doc.rect(0, 0, pageWidth, 38, "F");
+    doc.setFont("helvetica", "bold");
+    doc.setFontSize(9);
+    doc.setTextColor(0, 225, 255);
+    doc.text("FEWS NIGERIA", margin, 13);
+    doc.setFontSize(phoneLayout ? 12 : 15);
+    doc.setTextColor(242, 247, 255);
+    doc.text("METEOROLOGICAL STATION BULLETIN", margin, 23);
+    doc.setFont("helvetica", "normal");
+    doc.setFontSize(8);
+    doc.setTextColor(174, 192, 212);
+    doc.text("Live station telemetry report", margin, 31);
+
+    let y = 49;
+    doc.setFont("helvetica", "bold");
+    doc.setFontSize(phoneLayout ? 14 : 16);
+    doc.setTextColor(24, 42, 60);
+    const stationName = doc.splitTextToSize(
+      props.station_name || "Meteorological Station",
+      contentWidth,
+    );
+    doc.text(stationName, margin, y);
+    y += stationName.length * (phoneLayout ? 6 : 7) + 2;
+
+    doc.setFont("helvetica", "normal");
+    doc.setFontSize(8);
+    doc.setTextColor(83, 103, 123);
+    doc.text(`Station ID: ${props.station_id || "--"}`, margin, y);
+    doc.text(
+      `Location: ${Number(coords[1]).toFixed(4)} N, ${Number(coords[0]).toFixed(4)} E`,
+      margin,
+      y + 5,
+    );
+    doc.text(`Observed: ${observedAt}`, pageWidth - margin, y + 5, {
+      align: "right",
+    });
+    y += 13;
+
+    const summary = [
+      ["TEMPERATURE", `${temperature} C`],
+      ["FEELS LIKE", `${feelsLike} C`],
+      ["HUMIDITY", `${humidity} %`],
+      ["PRESSURE", `${pressure} hPa`],
+    ];
+    const summaryColumns = phoneLayout ? 2 : 4;
+    const summaryGap = phoneLayout ? 4 : 3;
+    const summaryWidth =
+      (contentWidth - summaryGap * (summaryColumns - 1)) / summaryColumns;
+    const summaryHeight = phoneLayout ? 19 : 20;
+    summary.forEach(([label, value], index) => {
+      const column = index % summaryColumns;
+      const row = Math.floor(index / summaryColumns);
+      const x = margin + column * (summaryWidth + summaryGap);
+      const cardY = y + row * (summaryHeight + summaryGap);
+      doc.setFillColor(237, 243, 248);
+      doc.setDrawColor(213, 224, 234);
+      doc.roundedRect(x, cardY, summaryWidth, summaryHeight, 1.5, 1.5, "FD");
+      doc.setFont("helvetica", "bold");
+      doc.setFontSize(phoneLayout ? 7 : 6.5);
+      doc.setTextColor(83, 103, 123);
+      doc.text(label, x + 3, cardY + 6);
+      doc.setFontSize(phoneLayout ? 9 : 10);
+      doc.setTextColor(24, 42, 60);
+      doc.text(value, x + 3, cardY + 14);
+    });
+    const summaryRows = Math.ceil(summary.length / summaryColumns);
+    y += summaryRows * summaryHeight + (summaryRows - 1) * summaryGap + 11;
+
+    const direction = getCardinalDirection(parseFloat(windDirection) || 0);
+    const rows = [
+      ["Temperature (2m)", `${temperature} C`, "18-34 C", "Calibrated"],
+      ["Feels like", `${feelsLike} C`, "--", "--"],
+      ["Relative humidity", `${humidity} %`, "40-95 %", "Optimal"],
+      ["Sustained wind speed", `${windSpeed} km/h`, "Under 40 km/h", "Normal"],
+      [
+        "Wind direction",
+        `${windDirection} deg (${direction})`,
+        "0-360 deg",
+        "Active",
+      ],
+      ["Peak wind gust", `${windGust} km/h`, "Under 55 km/h", "Tracking"],
+      [
+        "Surface / sea-level pressure",
+        `${pressure} hPa`,
+        "940-1025 hPa",
+        "Nominal",
+      ],
+      [
+        "Precipitation / rain rate",
+        `${rainRate} mm/h`,
+        "Over 5 mm/h is heavy",
+        rainValue > 0 ? "Active rain" : "Dry / clear",
+      ],
+      ["Calculated dew point", `${dewPoint} C`, "--", "Valid"],
+    ];
+    const widths = phoneLayout
+      ? [
+          contentWidth * 0.28,
+          contentWidth * 0.2,
+          contentWidth * 0.26,
+          contentWidth * 0.26,
+        ]
+      : [52, 36, 52, contentWidth - 140];
+    const headings = phoneLayout
+      ? ["PARAMETER", "VALUE", "BASELINE", "STATUS"]
+      : ["PARAMETER", "OBSERVED", "REFERENCE", "STATUS"];
+    const drawTableHeader = () => {
+      doc.setFillColor(20, 36, 56);
+      doc.rect(margin, y, contentWidth, 9, "F");
+      doc.setFont("helvetica", "bold");
+      doc.setFontSize(phoneLayout ? 6.5 : 7);
+      doc.setTextColor(236, 244, 251);
+      let x = margin;
+      headings.forEach((heading, index) => {
+        doc.text(heading, x + 2, y + 6);
+        x += widths[index];
+      });
+      y += 9;
+    };
+
+    doc.setFont("helvetica", "bold");
+    doc.setFontSize(9);
+    doc.setTextColor(24, 42, 60);
+    doc.text("TELEMETRY DETAILS", margin, y);
+    y += 4;
+    drawTableHeader();
+
+    rows.forEach((row, rowIndex) => {
+      const wrapped = row.map((cell, index) =>
+        doc.splitTextToSize(String(cell), widths[index] - 4),
+      );
+      const lineCount = Math.max(...wrapped.map((lines) => lines.length));
+      const rowHeight = Math.max(8, lineCount * 3.6 + 3);
+      if (y + rowHeight > pageHeight - 38) {
+        doc.addPage();
+        y = 18;
+        drawTableHeader();
+      }
+
+      if (rowIndex % 2 === 0) {
+        doc.setFillColor(245, 248, 251);
+        doc.rect(margin, y, contentWidth, rowHeight, "F");
+      }
+      doc.setFont("helvetica", "normal");
+      doc.setFontSize(phoneLayout ? 8 : 7.5);
+      doc.setTextColor(48, 66, 84);
+      let x = margin;
+      wrapped.forEach((lines, index) => {
+        doc.text(lines, x + 2, y + 5);
+        x += widths[index];
+      });
+      doc.setDrawColor(221, 229, 236);
+      doc.line(margin, y + rowHeight, margin + contentWidth, y + rowHeight);
+      y += rowHeight;
+    });
+
+    const advisoryLines = doc.splitTextToSize(advisory, contentWidth - 8);
+    const advisoryHeight = advisoryLines.length * 4 + 9;
+    if (y + advisoryHeight > pageHeight - 24) {
+      doc.addPage();
+      y = 20;
+    } else {
+      y += 5;
+    }
+    doc.setFillColor(255, 247, 230);
+    doc.setDrawColor(240, 190, 91);
+    doc.roundedRect(margin, y, contentWidth, advisoryHeight, 1.5, 1.5, "FD");
+    doc.setFont("helvetica", "bold");
+    doc.setFontSize(8);
+    doc.setTextColor(126, 82, 19);
+    doc.text("METEOROLOGICAL ADVISORY", margin + 4, y + 6);
+    doc.setFont("helvetica", "normal");
+    doc.setFontSize(7.5);
+    doc.text(advisoryLines, margin + 4, y + 11);
+
+    const stationFileName = String(props.station_id || "station").replace(
+      /[^a-z0-9_-]/gi,
+      "_",
+    );
+    const date = new Date().toISOString().slice(0, 10);
+    doc.save(`FEWS_Report_${stationFileName}_${date}.pdf`);
+    showToast("Station report PDF downloaded.");
+  } catch (error) {
+    console.error("Could not generate station report PDF:", error);
+    showToast("PDF download unavailable. Opening the print dialog instead.");
+    window.print();
+  }
 }
 
 function downloadCurrentStationCSV() {

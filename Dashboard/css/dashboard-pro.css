@@ -1819,7 +1819,7 @@ body {
 }
 
 /* Container: transparent shell so only the trigger button shows */
-.leaflet-control-layers.leaflet-control-layers-tree {
+.leaflet-control-layers {
   margin: 0 !important;
   background: transparent !important;
   border: none !important;
@@ -1894,7 +1894,7 @@ body {
 }
 
 /* ── Hover state: button glows, exactly like .leaflet-control-measure:hover ── */
-.leaflet-control-layers.leaflet-control-layers-tree:hover .layers-trigger-btn,
+.leaflet-control-layers:hover .layers-trigger-btn,
 .layers-trigger-btn:hover {
   background: rgba(0, 242, 254, 0.15) !important;
   color: #00f2fe !important;
@@ -1904,8 +1904,9 @@ body {
     0 0 16px rgba(0, 242, 254, 0.2) !important;
 }
 
-/* ── Dropdown form — hidden by default, revealed on hover ── */
-.layers-dropdown-form {
+/* ── Dropdown panel — hidden by default, revealed on hover or click ── */
+
+.layers-dropdown-panel {
   display: block !important;
   position: absolute !important;
   top: calc(100% + 6px) !important;
@@ -1942,8 +1943,7 @@ body {
 }
 
 /* Expand the dropdown on hover of the whole container */
-.leaflet-control-layers.leaflet-control-layers-tree:hover
-  .layers-dropdown-form {
+.leaflet-control-layers:hover .layers-dropdown-panel {
   max-height: 70vh !important;
   opacity: 1 !important;
   pointer-events: auto !important;
@@ -1953,20 +1953,20 @@ body {
 }
 
 /* ── Scrollbar inside the dropdown ── */
-.layers-dropdown-form::-webkit-scrollbar {
+.layers-dropdown-panel::-webkit-scrollbar {
   width: 4px;
 }
 
-.layers-dropdown-form::-webkit-scrollbar-track {
+.layers-dropdown-panel::-webkit-scrollbar-track {
   background: transparent;
 }
 
-.layers-dropdown-form::-webkit-scrollbar-thumb {
+.layers-dropdown-panel::-webkit-scrollbar-thumb {
   background: rgba(0, 242, 254, 0.35);
   border-radius: 4px;
 }
 
-.layers-dropdown-form::-webkit-scrollbar-thumb:hover {
+.layers-dropdown-panel::-webkit-scrollbar-thumb:hover {
   background: rgba(0, 242, 254, 0.6);
 }
 
@@ -2663,7 +2663,7 @@ body {
 
 .leaflet-control-zoom a:hover,
 .leaflet-control-measure .leaflet-bar-part:hover,
-.leaflet-control-layers.leaflet-control-layers-tree:hover .layers-trigger-btn,
+.leaflet-control-layers:hover .layers-trigger-btn,
 .layers-trigger-btn:hover {
   border-color: #a9cdb8 !important;
   background: #edf6f0 !important;
@@ -2671,7 +2671,7 @@ body {
   box-shadow: 0 4px 12px rgba(27, 56, 43, 0.12) !important;
 }
 
-.layers-dropdown-form {
+.layers-dropdown-panel {
   border-color: #d8e3dc !important;
   background: rgba(251, 252, 250, 0.98) !important;
   box-shadow: 0 12px 32px rgba(27, 56, 43, 0.16) !important;
@@ -2787,13 +2787,13 @@ body {
 .report-modal {
   border-color: #d8e3dc;
   border-radius: 9px;
-  background: #fbfcfa;
+  background: #1e293b;
   box-shadow: 0 24px 70px rgba(27, 56, 43, 0.24);
 }
 
 .report-modal-header,
 .report-modal-footer {
-  border-color: #e5ece7;
+  border-color: #1e293b;
 }
 
 .report-title {
@@ -3404,14 +3404,14 @@ body,
 
 .leaflet-control-zoom a:hover,
 .leaflet-control-measure .leaflet-bar-part:hover,
-.leaflet-control-layers.leaflet-control-layers-tree:hover .layers-trigger-btn,
+.leaflet-control-layers:hover .layers-trigger-btn,
 .layers-trigger-btn:hover {
   border-color: rgba(0, 225, 255, 0.55) !important;
   background: rgba(0, 225, 255, 0.12) !important;
   color: var(--accent-cyan) !important;
 }
 
-.layers-dropdown-form {
+.layers-dropdown-panel {
   border-color: rgba(0, 225, 255, 0.24) !important;
   background: rgba(8, 17, 31, 0.98) !important;
   color: #e7f0fa !important;
@@ -3698,5 +3698,327 @@ body,
   }
   .popup-footer {
     padding: 8px 10px;
+  }
+}
+
+.leaflet-control-layers.is-open .layers-dropdown-panel {
+  max-height: 70vh !important;
+  overflow-y: auto !important;
+  padding: 10px 12px 14px !important;
+  opacity: 1 !important;
+  pointer-events: auto !important;
+  transform: translateY(0) !important;
+}
+
+.leaflet-control-layers.is-open .layers-trigger-btn {
+  border-color: rgba(0, 225, 255, 0.55) !important;
+  background: rgba(0, 225, 255, 0.12) !important;
+  color: var(--accent-cyan) !important;
+}
+
+.station-card {
+  display: flex;
+  align-items: center;
+  width: 100%;
+  min-height: 46px;
+  padding: 11px 13px;
+  color: inherit;
+  font: inherit;
+  text-align: left;
+}
+
+.station-card .st-card-title {
+  width: 100%;
+  font-size: 14px;
+}
+
+/* Station bulletin contrast and layout */
+.report-modal {
+  border: 1px solid rgba(0, 225, 255, 0.3);
+  background: #091322;
+  color: #e8f0fa;
+  box-shadow: 0 24px 70px rgba(0, 0, 0, 0.55);
+}
+
+.report-modal-header,
+.report-modal-footer {
+  border-color: rgba(151, 178, 207, 0.17);
+  background: #0d192a;
+}
+
+.report-title {
+  color: #f2f7ff;
+}
+
+.report-subtitle,
+.report-footer-meta {
+  color: #adbed1;
+}
+
+.report-modal-body {
+  min-height: 0;
+  overflow: auto;
+  background: #0a1423;
+  color: #dce7f4;
+}
+
+.report-modal .bulletin-card {
+  color: #dce7f4;
+  font-size: 13px;
+  line-height: 1.5;
+}
+
+.bulletin-station-head {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 18px;
+  padding: 16px;
+  border: 1px solid rgba(148, 174, 201, 0.16);
+  border-radius: 7px;
+  background: #101e31;
+}
+
+.bulletin-name {
+  margin-bottom: 7px;
+  color: #f1f6fd;
+  font-size: 18px;
+  font-weight: 700;
+  line-height: 1.3;
+}
+
+.bulletin-id-tag {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  padding: 4px 7px;
+  border: 1px solid rgba(0, 225, 255, 0.28);
+  border-radius: 4px;
+  background: rgba(0, 225, 255, 0.08);
+  color: #6deaff;
+  font-family: var(--font-mono);
+  font-size: 10px;
+}
+
+.bulletin-status-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 5px 8px;
+  border: 1px solid rgba(8, 201, 154, 0.28);
+  border-radius: 4px;
+  background: rgba(8, 201, 154, 0.1);
+  color: #49e0b5;
+  font-size: 10px;
+  font-weight: 700;
+  white-space: nowrap;
+}
+
+.bulletin-metrics-summary {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 9px;
+  margin: 12px 0;
+}
+
+.bulletin-summary-box {
+  min-width: 0;
+  padding: 11px 12px;
+  border: 1px solid rgba(148, 174, 201, 0.15);
+  border-radius: 6px;
+  background: #101e31;
+}
+
+.bulletin-summary-label {
+  margin-bottom: 5px;
+  color: #a8b9ce;
+  font-size: 10px;
+  font-weight: 650;
+  line-height: 1.35;
+}
+
+.bulletin-summary-val {
+  color: #f2f7ff !important;
+  font-family: var(--font-mono);
+  font-size: 18px;
+  font-weight: 700;
+  line-height: 1.25;
+}
+
+.bulletin-table {
+  width: 100%;
+  margin-top: 10px;
+  border-collapse: collapse;
+  color: #dce7f4;
+  font-size: 12px;
+  text-align: left;
+}
+
+.bulletin-table th {
+  padding: 10px 11px;
+  border-bottom: 1px solid rgba(0, 225, 255, 0.22);
+  background: #14243a;
+  color: #d8e7f5;
+  font-size: 10px;
+  font-weight: 700;
+  line-height: 1.4;
+  text-transform: uppercase;
+}
+
+.bulletin-table td {
+  padding: 9px 11px;
+  border-bottom: 1px solid rgba(148, 174, 201, 0.12);
+  color: #dce7f4;
+  line-height: 1.4;
+  vertical-align: middle;
+}
+
+.bulletin-table tbody tr:nth-child(even) {
+  background: rgba(255, 255, 255, 0.035);
+}
+
+.bulletin-table tbody tr:hover {
+  background: rgba(0, 225, 255, 0.055);
+}
+
+.bulletin-param-name {
+  color: #e8f0fa;
+  font-weight: 600;
+}
+
+.bulletin-param-val {
+  color: #f5f8fd;
+  font-family: var(--font-mono);
+  font-weight: 600;
+  white-space: nowrap;
+}
+
+.bulletin-advisory-box {
+  padding: 12px 14px;
+  border: 1px solid rgba(245, 166, 35, 0.24);
+  border-left: 3px solid #f5a623;
+  border-radius: 5px;
+  background: rgba(245, 166, 35, 0.07);
+  color: #e6edf6;
+  line-height: 1.55;
+}
+
+.bulletin-advisory-box strong {
+  color: #ffd27a;
+}
+
+@media (max-width: 760px) {
+  .report-modal-header,
+  .report-modal-footer {
+    gap: 10px;
+    padding: 12px;
+  }
+
+  .report-title {
+    font-size: 15px;
+  }
+
+  .report-modal-body {
+    padding: 12px;
+  }
+
+  .bulletin-station-head {
+    flex-direction: column;
+    gap: 10px;
+    padding: 12px;
+  }
+
+  .bulletin-metrics-summary {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .bulletin-table {
+    display: block;
+    width: 100%;
+    overflow: visible;
+    white-space: normal;
+  }
+
+  .bulletin-table thead {
+    display: none;
+  }
+
+  .bulletin-table tbody {
+    display: grid;
+    gap: 7px;
+  }
+
+  .bulletin-table tr {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 8px 12px;
+    padding: 10px;
+    border: 1px solid rgba(148, 174, 201, 0.16);
+    border-radius: 6px;
+    background: #101e31;
+  }
+
+  .bulletin-table tbody tr:nth-child(even) {
+    background: #101e31;
+  }
+
+  .bulletin-table td {
+    display: block;
+    min-width: 0;
+    padding: 0;
+    border: 0;
+    color: #dce7f4 !important;
+    font-size: 10px;
+    line-height: 1.4;
+    white-space: normal;
+    overflow-wrap: anywhere;
+  }
+
+  .bulletin-table td::before {
+    display: block;
+    margin-bottom: 2px;
+    color: #91a7bd;
+    font-size: 8px;
+    font-weight: 700;
+    line-height: 1.3;
+    text-transform: uppercase;
+  }
+
+  .bulletin-table td:nth-child(1) {
+    grid-column: 1 / -1;
+    color: #f0f5fb !important;
+    font-size: 11px;
+    font-weight: 650;
+  }
+
+  .bulletin-table td:nth-child(1)::before {
+    content: "Parameter";
+  }
+
+  .bulletin-table td:nth-child(2)::before {
+    content: "Observed";
+  }
+
+  .bulletin-table td:nth-child(3)::before {
+    content: "Baseline";
+  }
+
+  .bulletin-table td:nth-child(4)::before {
+    content: "Status";
+  }
+
+  .report-footer-actions {
+    display: grid;
+    width: 100%;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 7px;
+  }
+
+  .report-footer-actions .hud-btn {
+    justify-content: center;
+    min-width: 0;
+    padding: 8px 6px;
+    white-space: normal;
+    text-align: center;
   }
 }
