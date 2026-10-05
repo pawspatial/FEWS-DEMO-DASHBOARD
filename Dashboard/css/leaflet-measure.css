@@ -1,0 +1,257 @@
+/* ==========================================================================
+   FEWS Dashboard — Leaflet Measure Tool: Custom Glassmorphic Theme
+   ========================================================================== */
+
+/* ─── Toggle Button ─────────────────────────────────────────────────────── */
+.leaflet-control-measure {
+  background: rgba(7, 13, 24, 0.88);
+  border-radius: 10px !important;
+  box-shadow: 0 4px 24px rgba(0, 0, 0, 0.55), 0 0 0 1px rgba(0, 242, 254, 0.15) !important;
+  border: 1px solid rgba(0, 242, 254, 0.18) !important;
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
+  overflow: hidden;
+}
+
+.leaflet-control-measure .leaflet-control-measure-toggle,
+.leaflet-control-measure .leaflet-control-measure-toggle:hover {
+  display: flex !important;
+  align-items: center;
+  justify-content: center;
+  width: 36px !important;
+  height: 36px !important;
+  background-color: transparent !important;
+  background-image: none !important;
+  text-indent: 0 !important;
+  white-space: normal !important;
+  overflow: visible !important;
+  border-radius: 9px !important;
+  color: #00f2fe;
+  font-size: 15px;
+  transition: background 0.2s, color 0.2s;
+  cursor: pointer;
+  position: relative;
+}
+
+.leaflet-control-measure .leaflet-control-measure-toggle::before {
+  content: '\f545'; /* fa-ruler-combined */
+  font-family: 'Font Awesome 5 Free';
+  font-weight: 900;
+  font-size: 15px;
+  color: #00f2fe;
+}
+
+.leaflet-control-measure .leaflet-control-measure-toggle:hover {
+  background: rgba(0, 242, 254, 0.12) !important;
+}
+
+.leaflet-touch .leaflet-control-measure .leaflet-control-measure-toggle,
+.leaflet-touch .leaflet-control-measure .leaflet-control-measure-toggle:hover {
+  width: 40px !important;
+  height: 40px !important;
+}
+
+/* ─── Measurement Interaction Panel ─────────────────────────────────────── */
+.leaflet-control-measure .leaflet-control-measure-interaction {
+  padding: 12px 14px;
+  min-width: 200px;
+  background: rgba(7, 13, 24, 0.92);
+  backdrop-filter: blur(20px);
+}
+
+/* ─── Headings ───────────────────────────────────────────────────────────── */
+.leaflet-control-measure h3,
+.leaflet-measure-resultpopup h3 {
+  margin: 0 0 10px 0;
+  padding-bottom: 8px;
+  line-height: 1.2em;
+  font-weight: 600;
+  font-size: 0.82em;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: #00f2fe;
+  border-bottom: 1px solid rgba(0, 242, 254, 0.2);
+  font-family: 'Outfit', sans-serif;
+}
+
+/* ─── Paragraphs ─────────────────────────────────────────────────────────── */
+.leaflet-control-measure p,
+.leaflet-measure-resultpopup p {
+  margin: 8px 0 0;
+  line-height: 1.5em;
+  font-size: 12px;
+  color: #94a3b8;
+  font-family: 'Outfit', sans-serif;
+}
+
+.leaflet-control-measure p:first-child,
+.leaflet-measure-resultpopup p:first-child {
+  margin-top: 0;
+}
+
+/* ─── Links / Action Buttons ─────────────────────────────────────────────── */
+.leaflet-control-measure a,
+.leaflet-measure-resultpopup a {
+  color: #00f2fe;
+  text-decoration: none;
+  font-size: 12px;
+  font-family: 'Outfit', sans-serif;
+  font-weight: 500;
+  transition: opacity 0.2s;
+}
+
+.leaflet-control-measure a:hover,
+.leaflet-measure-resultpopup a:hover {
+  opacity: 0.7;
+  text-decoration: none;
+}
+
+/* ─── Task Links Row ─────────────────────────────────────────────────────── */
+.leaflet-control-measure .tasks,
+.leaflet-measure-resultpopup .tasks {
+  margin: 10px 0 0;
+  padding: 8px 0 0;
+  border-top: 1px solid rgba(255, 255, 255, 0.07);
+  list-style: none;
+  list-style-image: none;
+  display: flex;
+  gap: 10px;
+  flex-wrap: wrap;
+}
+
+.leaflet-control-measure .tasks li,
+.leaflet-measure-resultpopup .tasks li {
+  display: inline;
+  margin: 0;
+}
+
+/* Style action link buttons (start, cancel, finish) */
+.leaflet-control-measure a.start,
+.leaflet-control-measure a.cancel,
+.leaflet-control-measure a.finish {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  padding: 4px 11px;
+  border-radius: 6px;
+  font-size: 11.5px;
+  font-weight: 600;
+  letter-spacing: 0.03em;
+  background-image: none !important;
+  padding-left: 11px !important;
+  transition: background 0.2s, color 0.2s;
+}
+
+.leaflet-control-measure a.start {
+  background: rgba(0, 242, 254, 0.12);
+  color: #00f2fe;
+  border: 1px solid rgba(0, 242, 254, 0.25);
+}
+.leaflet-control-measure a.start:hover {
+  background: rgba(0, 242, 254, 0.22);
+  opacity: 1;
+}
+.leaflet-control-measure a.start::before {
+  content: '▶ ';
+}
+
+.leaflet-control-measure a.cancel {
+  background: rgba(244, 63, 94, 0.12);
+  color: #f43f5e;
+  border: 1px solid rgba(244, 63, 94, 0.25);
+}
+.leaflet-control-measure a.cancel:hover {
+  background: rgba(244, 63, 94, 0.22);
+  opacity: 1;
+}
+.leaflet-control-measure a.cancel::before {
+  content: '✕ ';
+}
+
+.leaflet-control-measure a.finish {
+  background: rgba(16, 185, 129, 0.12);
+  color: #10b981;
+  border: 1px solid rgba(16, 185, 129, 0.25);
+}
+.leaflet-control-measure a.finish:hover {
+  background: rgba(16, 185, 129, 0.22);
+  opacity: 1;
+}
+.leaflet-control-measure a.finish::before {
+  content: '✓ ';
+}
+
+/* ─── Prompt / start area ────────────────────────────────────────────────── */
+.leaflet-control-measure .startprompt h3 {
+  margin-bottom: 8px;
+}
+.leaflet-control-measure .startprompt .tasks {
+  margin-top: 0;
+  padding-top: 0;
+  border-top: 0;
+}
+
+/* ─── Results area ───────────────────────────────────────────────────────── */
+.leaflet-control-measure .results .group {
+  margin-top: 8px;
+  padding-top: 8px;
+  border-top: 1px dotted rgba(255, 255, 255, 0.08);
+}
+.leaflet-control-measure .results .group:first-child {
+  margin-top: 0;
+  padding-top: 0;
+  border-top: 0;
+}
+.leaflet-control-measure .results .heading {
+  margin-right: 5px;
+  color: #64748b;
+  font-size: 11px;
+}
+.leaflet-control-measure .results .val {
+  color: #f1f5f9;
+  font-family: 'JetBrains Mono', monospace;
+  font-size: 12px;
+}
+
+/* ─── Coord divider ──────────────────────────────────────────────────────── */
+.leaflet-control-measure .coorddivider,
+.leaflet-measure-resultpopup .coorddivider {
+  color: #64748b;
+}
+
+/* ─── Result Popup ───────────────────────────────────────────────────────── */
+.leaflet-measure-resultpopup {
+  background: rgba(7, 13, 24, 0.94) !important;
+  border: 1px solid rgba(0, 242, 254, 0.2) !important;
+  border-radius: 10px !important;
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.5), 0 0 0 1px rgba(0, 242, 254, 0.1) !important;
+  backdrop-filter: blur(16px);
+  padding: 10px 14px;
+  color: #f1f5f9;
+}
+
+.leaflet-measure-resultpopup a.zoomto,
+.leaflet-measure-resultpopup a.deletemarkup {
+  background-image: none !important;
+  padding-left: 0 !important;
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  padding: 3px 9px !important;
+  border-radius: 5px;
+  font-size: 11px;
+}
+
+.leaflet-measure-resultpopup a.zoomto {
+  background: rgba(56, 189, 248, 0.12);
+  color: #38bdf8;
+  border: 1px solid rgba(56, 189, 248, 0.2);
+}
+.leaflet-measure-resultpopup a.zoomto:hover { background: rgba(56, 189, 248, 0.22); opacity: 1; }
+
+.leaflet-measure-resultpopup a.deletemarkup {
+  background: rgba(244, 63, 94, 0.12);
+  color: #f43f5e;
+  border: 1px solid rgba(244, 63, 94, 0.2);
+}
+.leaflet-measure-resultpopup a.deletemarkup:hover { background: rgba(244, 63, 94, 0.22); opacity: 1; }

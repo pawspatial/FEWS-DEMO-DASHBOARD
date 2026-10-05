@@ -1,0 +1,623 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta
+      name="viewport"
+      content="initial-scale=1,user-scalable=no,maximum-scale=1,width=device-width"
+    />
+    <meta name="mobile-web-app-capable" content="yes" />
+    <meta name="apple-web-app-capable" content="yes" />
+    <title>
+      FEWS Nigeria | Live Weather Station Telemetry & Spatial Intelligence
+    </title>
+
+    <!-- Stylesheets -->
+    <link rel="stylesheet" href="css/leaflet.css" />
+    <link rel="stylesheet" href="css/L.Control.Layers.Tree.css" />
+    <link rel="stylesheet" href="css/fontawesome-all.min.css" />
+    <!-- photon search removed -->
+    <link rel="stylesheet" href="css/leaflet-measure.css" />
+    <link rel="stylesheet" href="css/dashboard-pro.css" />
+
+    <!-- Chart.js for Telemetry Analytics -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
+  </head>
+
+  <body>
+    <div id="dashboard-root">
+      <!-- ================================================================
+             Header Bar
+             ================================================================ -->
+      <header class="dash-header">
+        <div class="brand-section">
+          <button
+            class="hud-btn"
+            id="toggleSidebarBtn"
+            title="Toggle Station Explorer"
+          >
+            <i class="fas fa-bars"></i>
+          </button>
+          <div class="brand-icon-wrapper">
+            <i class="fas fa-satellite-dish"></i>
+          </div>
+          <div class="brand-titles">
+            <div class="brand-title">
+              FEWS DEMO DASHBOARD <span class="badge">Live Stream</span>
+            </div>
+            <div class="brand-subtitle">
+              Weather Station Telemetry & Early Warning System
+            </div>
+          </div>
+        </div>
+
+        <!-- Telemetry Status Beacon -->
+        <div class="telemetry-status-wrapper">
+          <div class="live-beacon-pill">
+            <div class="beacon-dot"></div>
+            <span id="liveBadgeText">LIVE TELEMETRY STREAM</span>
+          </div>
+          <div class="sync-timer-label">
+            <i class="far fa-clock"></i>
+            <span id="lastSyncTime">Syncing...</span> &middot; Next:
+            <span id="autoSyncCountdown" style="color: var(--accent-cyan)"
+              >60s</span
+            >
+          </div>
+        </div>
+
+        <!-- Action Controls -->
+        <div class="header-actions">
+          <button
+            class="hud-btn primary"
+            id="refreshBtn"
+            title="Fetch real-time weather immediately"
+          >
+            <i class="fas fa-sync-alt" id="refreshIcon"></i>
+            <span>Refresh Now</span>
+          </button>
+          <button
+            class="hud-btn"
+            id="headerReportBtn"
+            title="View & Download Official Station Report"
+          >
+            <i class="fas fa-file-alt" style="color: var(--accent-cyan)"></i>
+            <span>Station Report</span>
+          </button>
+          <button
+            class="hud-btn"
+            id="toggleAnalyticsBtn"
+            title="View Station Analytics & Charts"
+          >
+            <i class="fas fa-chart-line"></i>
+            <span>Telemetry Analytics</span>
+          </button>
+          <button
+            class="hud-btn"
+            id="toggleLayersBtn"
+            title="Toggle Map Layers Panel"
+          >
+            <i class="fas fa-layer-group" style="color: var(--accent-cyan)"></i>
+            <span>Map Layers</span>
+          </button>
+          <button
+            class="hud-btn"
+            id="exportGeoJsonBtn"
+            title="Download updated GeoJSON"
+          >
+            <i class="fas fa-file-download"></i>
+            <span>Export Data</span>
+          </button>
+        </div>
+      </header>
+
+      <!-- ================================================================
+             Main Workspace (Sidebar + Map Viewport)
+             ================================================================ -->
+      <main class="dash-body">
+        <!-- Left Sidebar: Station Explorer -->
+        <aside class="dash-sidebar" id="dashSidebar">
+          <div class="sidebar-header">
+            <div class="sidebar-title-row">
+              <div class="sidebar-title">
+                <i class="fas fa-broadcast-tower"></i> Monitored Stations
+              </div>
+              <span class="station-count-badge" id="stationCountBadge"
+                >5 Stations</span
+              >
+            </div>
+
+            <!-- Search Input -->
+            <div class="search-wrapper">
+              <i class="fas fa-search search-icon"></i>
+              <input
+                type="text"
+                id="stationSearch"
+                class="station-search-input"
+                placeholder="Search by station name or ID..."
+              />
+            </div>
+
+            <!-- Filter Chips -->
+            <div class="filter-chips">
+              <button class="filter-chip active" data-filter="all">
+                All (5)
+              </button>
+              <button class="filter-chip" data-filter="hot">
+                <i class="fas fa-temperature-high"></i> Heat Alert
+              </button>
+              <button class="filter-chip" data-filter="wind">
+                <i class="fas fa-wind"></i> High Wind
+              </button>
+              <button class="filter-chip" data-filter="rain">
+                <i class="fas fa-cloud-rain"></i> Rain Active
+              </button>
+            </div>
+          </div>
+
+          <!-- Station Cards Container -->
+          <div class="sidebar-content" id="stationCardList">
+            <!-- Station cards rendered dynamically by dashboard-app.js -->
+          </div>
+        </aside>
+
+        <!-- Map Viewport -->
+        <section class="map-viewport">
+          <!-- Floating Top KPI HUD Strip -->
+          <div class="floating-kpi-bar">
+            <!-- KPI 1: Active Stations -->
+            <div class="kpi-card stations">
+              <div class="kpi-icon-box"><i class="fas fa-signal"></i></div>
+              <div class="kpi-text-box">
+                <span class="kpi-label">Active Stations</span>
+                <span class="kpi-value" id="kpiActiveStations">5 / 5</span>
+                <span class="kpi-sub" id="kpiActiveSub">100% Online</span>
+              </div>
+            </div>
+
+            <!-- KPI 2: Average Temperature -->
+            <div class="kpi-card temp">
+              <div class="kpi-icon-box">
+                <i class="fas fa-temperature-high"></i>
+              </div>
+              <div class="kpi-text-box">
+                <span class="kpi-label">Avg Temperature</span>
+                <span class="kpi-value" id="kpiAvgTemp">--°C</span>
+                <span class="kpi-sub" id="kpiTempSub">Calculating...</span>
+              </div>
+            </div>
+
+            <!-- KPI 3: Average Humidity -->
+            <div class="kpi-card humidity">
+              <div class="kpi-icon-box"><i class="fas fa-tint"></i></div>
+              <div class="kpi-text-box">
+                <span class="kpi-label">Avg Humidity</span>
+                <span class="kpi-value" id="kpiAvgHum">--%</span>
+                <span class="kpi-sub" id="kpiHumSub">Moisture Index</span>
+              </div>
+            </div>
+
+            <!-- KPI 4: Peak Wind Gust -->
+            <div class="kpi-card wind">
+              <div class="kpi-icon-box"><i class="fas fa-wind"></i></div>
+              <div class="kpi-text-box">
+                <span class="kpi-label">Peak Wind Gust</span>
+                <span class="kpi-value" id="kpiMaxWind">-- km/h</span>
+                <span class="kpi-sub" id="kpiWindSub">Tracking...</span>
+              </div>
+            </div>
+
+            <!-- KPI 5: Mean Pressure -->
+            <div class="kpi-card pressure">
+              <div class="kpi-icon-box">
+                <i class="fas fa-tachometer-alt"></i>
+              </div>
+              <div class="kpi-text-box">
+                <span class="kpi-label">Mean Pressure</span>
+                <span class="kpi-value" id="kpiAvgPressure">-- hPa</span>
+                <span class="kpi-sub" id="kpiPressureSub"
+                  >Atmospheric Level</span
+                >
+              </div>
+            </div>
+          </div>
+
+          <!-- Leaflet Map Container -->
+          <div id="map"></div>
+
+          <!-- Floating Bottom/Right Analytics Drawer -->
+          <div class="analytics-drawer hidden" id="analyticsDrawer">
+            <div class="analytics-header">
+              <div class="analytics-title">
+                <i
+                  class="fas fa-chart-bar"
+                  style="color: var(--accent-cyan)"
+                ></i>
+                Station Telemetry Analytics
+              </div>
+              <button
+                class="hud-btn"
+                id="closeAnalyticsBtn"
+                style="padding: 4px 8px"
+              >
+                <i class="fas fa-times"></i>
+              </button>
+            </div>
+
+            <div class="analytics-tabs">
+              <button class="tab-btn active" data-tab="temp">
+                Temperature & Heat
+              </button>
+              <button class="tab-btn" data-tab="wind">Wind & Gusts</button>
+              <button class="tab-btn" data-tab="pressure">
+                Humidity & Pressure
+              </button>
+            </div>
+
+            <div class="analytics-body">
+              <div class="chart-wrapper">
+                <canvas id="telemetryChart"></canvas>
+              </div>
+            </div>
+
+            <div class="analytics-footer">
+              <span style="font-size: 11px; color: var(--text-dim)"
+                >Live readings refreshed every 60s</span
+              >
+              <button
+                class="hud-btn"
+                id="exportCsvBtn"
+                style="padding: 4px 10px; font-size: 11px"
+              >
+                <i class="fas fa-file-csv"></i> Export CSV
+              </button>
+            </div>
+          </div>
+        </section>
+      </main>
+
+      <!-- Station Report Modal Dialog -->
+      <div class="report-modal-backdrop hidden" id="reportModalBackdrop">
+        <div class="report-modal" id="reportModal">
+          <div class="report-modal-header">
+            <div class="report-header-left">
+              <div class="report-seal"><i class="fas fa-file-invoice"></i></div>
+              <div>
+                <div class="report-title">METEOROLOGICAL STATION BULLETIN</div>
+                <div class="report-subtitle">
+                  Federal Early Warning System &middot; Official Telemetry
+                  Report
+                </div>
+              </div>
+            </div>
+            <button
+              class="hud-btn"
+              id="closeReportModalBtn"
+              style="padding: 6px 10px"
+            >
+              <i class="fas fa-times"></i>
+            </button>
+          </div>
+          <div class="report-modal-body" id="reportModalContent">
+            <!-- Injected dynamically by dashboard-app.js -->
+          </div>
+          <div class="report-modal-footer">
+            <div class="report-footer-meta">
+              <i
+                class="fas fa-shield-alt"
+                style="color: var(--accent-emerald)"
+              ></i>
+              Verified Sensor Ingest &middot; Live API Telemetry
+            </div>
+            <div class="report-footer-actions">
+              <button class="hud-btn" id="downloadStationCsvBtn">
+                <i class="fas fa-file-csv"></i> Download CSV
+              </button>
+              <button class="hud-btn" id="downloadStationJsonBtn">
+                <i class="fas fa-file-code"></i> Download JSON
+              </button>
+              <button class="hud-btn primary" id="printReportBtn">
+                <i class="fas fa-print"></i> Print / Save as PDF
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Toast Alert Notification -->
+      <div class="dash-toast" id="dashToast"></div>
+    </div>
+
+    <!-- Core Scripts (Clean, Minimal, Modern) -->
+    <script src="js/leaflet.js"></script>
+    <script src="js/L.Control.Layers.Tree.min.js"></script>
+    <script src="js/leaflet.rotatedMarker.js"></script>
+    <script src="js/leaflet-hash.js"></script>
+    <script src="js/Autolinker.min.js"></script>
+    <script src="js/leaflet-measure.js"></script>
+
+    <!-- Geospatial GeoJSON Data -->
+    <script src="data/NigeriaLGA_2.js"></script>
+    <script src="data/NigeriaStates_3.js"></script>
+    <script src="data/NigeriaBoundary_4.js"></script>
+    <script src="data/weather_stations_5.js"></script>
+
+    <!-- Map Setup & Layer Configuration -->
+    <script>
+      var map = L.map("map", {
+        zoomControl: false,
+        maxZoom: 28,
+        minZoom: 1,
+      }).fitBounds(
+        [
+          [4.2, 2.6],
+          [13.9, 14.7],
+        ],
+        {
+          paddingTopLeft: [20, 110],
+          paddingBottomRight: [20, 34],
+        },
+      );
+
+      var hash = new L.Hash(map);
+      map.attributionControl.setPrefix(
+        '<a href="https://leafletjs.com" target="_blank">Leaflet</a> &middot; FEWS Nigeria',
+      );
+      var autolinker = new Autolinker({
+        truncate: { length: 30, location: "smart" },
+      });
+
+      // Zoom Control — bottom right
+      var zoomControl = L.control.zoom({ position: "bottomright" }).addTo(map);
+
+      // Measure Control — bottom left (clear of KPI strip and sidebar)
+      var measureControl = new L.Control.Measure({
+        position: "bottomleft",
+        primaryLengthUnit: "meters",
+        secondaryLengthUnit: "kilometers",
+        primaryAreaUnit: "sqmeters",
+        secondaryAreaUnit: "hectares",
+        activeColor: "#00f2fe",
+        completedColor: "#10b981",
+      });
+      measureControl.addTo(map);
+
+      var bounds_group = new L.featureGroup([]);
+
+      // 1. Basemap: OpenStreetMap Standard
+      map.createPane("pane_OSM");
+      map.getPane("pane_OSM").style.zIndex = 200;
+      var layer_OSM_Standard = L.tileLayer(
+        "https://tile.openstreetmap.org/{z}/{x}/{y}.png",
+        {
+          pane: "pane_OSM",
+          opacity: 1.0,
+          attribution:
+            '&copy; <a href="https://www.openstreetmap.org/copyright" target="_blank">OpenStreetMap</a> contributors',
+          minZoom: 1,
+          maxZoom: 20,
+        },
+      );
+      map.addLayer(layer_OSM_Standard); // Set OpenStreetMap Standard as default active basemap
+
+      // 2. Basemap: Esri World Imagery (Satellite - 100% Free, High Resolution, No API Key)
+      map.createPane("pane_EsriImagery");
+      map.getPane("pane_EsriImagery").style.zIndex = 200;
+      var layer_EsriImagery = L.tileLayer(
+        "https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}",
+        {
+          pane: "pane_EsriImagery",
+          opacity: 1.0,
+          attribution: "Tiles &copy; Esri",
+          maxZoom: 19,
+        },
+      );
+
+      // 3. Basemap: Esri World Topographic Map (100% Free, No API Key Required)
+      map.createPane("pane_EsriTopo");
+      map.getPane("pane_EsriTopo").style.zIndex = 200;
+      var layer_EsriTopo = L.tileLayer(
+        "https://server.arcgisonline.com/ArcGIS/rest/services/World_Topo_Map/MapServer/tile/{z}/{y}/{x}",
+        {
+          pane: "pane_EsriTopo",
+          opacity: 1.0,
+          attribution: "Tiles &copy; Esri Topo",
+          maxZoom: 19,
+        },
+      );
+
+      // 4. Basemap: Wikimedia's OSM International style, used while HOT tiles are unavailable
+      var layer_OSM_Wikimedia = L.tileLayer(
+        "https://maps.wikimedia.org/osm-intl/{z}/{x}/{y}.png",
+        {
+          pane: "pane_OSM",
+          opacity: 1.0,
+          attribution:
+            '&copy; <a href="https://www.openstreetmap.org/copyright" target="_blank">OpenStreetMap</a> contributors &middot; Wikimedia maps',
+          minZoom: 1,
+          maxZoom: 19,
+        },
+      );
+
+      // 5. Basemap: Esri World Street Map (100% Free, No API Key Required)
+      map.createPane("pane_EsriStreet");
+      map.getPane("pane_EsriStreet").style.zIndex = 200;
+      var layer_EsriStreet = L.tileLayer(
+        "https://server.arcgisonline.com/ArcGIS/rest/services/World_Street_Map/MapServer/tile/{z}/{y}/{x}",
+        {
+          pane: "pane_EsriStreet",
+          opacity: 1.0,
+          attribution: "Tiles &copy; Esri Streets",
+          maxZoom: 19,
+        },
+      );
+
+      // Nigeria LGA Layer (subtle)
+      map.createPane("pane_NigeriaLGA_2");
+      map.getPane("pane_NigeriaLGA_2").style.zIndex = 402;
+      var layer_NigeriaLGA_2 = new L.geoJson(json_NigeriaLGA_2, {
+        pane: "pane_NigeriaLGA_2",
+        style: {
+          opacity: 0.5,
+          color: "rgba(51, 65, 85, 0.45)",
+          weight: 0.8,
+          fillOpacity: 0.05,
+          fillColor: "rgba(56, 189, 248, 0.05)",
+        },
+        onEachFeature: function (feature, layer) {
+          if (feature.properties && feature.properties.NAME_1) {
+            layer.bindTooltip("LGA: " + feature.properties.NAME_1, {
+              className: "hud-tooltip",
+              sticky: true,
+            });
+          }
+        },
+      });
+
+      // Nigeria States Layer (refined borders)
+      map.createPane("pane_NigeriaStates_3");
+      map.getPane("pane_NigeriaStates_3").style.zIndex = 403;
+      var layer_NigeriaStates_3 = new L.geoJson(json_NigeriaStates_3, {
+        pane: "pane_NigeriaStates_3",
+        style: {
+          opacity: 0.85,
+          color: "rgba(0, 220, 255, 0.42)",
+          weight: 1.1,
+          fillOpacity: 0.03,
+          fillColor: "rgba(0, 242, 254, 0.05)",
+        },
+        onEachFeature: function (feature, layer) {
+          if (feature.properties && feature.properties.NAME_1) {
+            layer.bindTooltip("State: " + feature.properties.NAME_1, {
+              className: "hud-tooltip",
+              sticky: true,
+            });
+          }
+        },
+      });
+      map.addLayer(layer_NigeriaStates_3);
+
+      // Nigeria National Boundary (glowing contour)
+      map.createPane("pane_NigeriaBoundary_4");
+      map.getPane("pane_NigeriaBoundary_4").style.zIndex = 404;
+      var layer_NigeriaBoundary_4 = new L.geoJson(json_NigeriaBoundary_4, {
+        pane: "pane_NigeriaBoundary_4",
+        style: {
+          opacity: 0.95,
+          color: "rgba(0, 225, 255, 0.96)",
+          weight: 2.5,
+          fillOpacity: 0.02,
+          fillColor: "rgba(0, 220, 255, 0.06)",
+        },
+      });
+      map.addLayer(layer_NigeriaBoundary_4);
+
+      // Layer Tree Switcher (Clean Basemaps & Overlays — 100% Free & No API Keys Required)
+      var baseTree = [
+        {
+          label:
+            '<div class="tree-category-row"><span class="tree-category-title"><i class="fas fa-globe-africa"></i> BASEMAPS</span><span class="tree-badge">1 Active</span></div>',
+          children: [
+            {
+              label:
+                '<div class="layer-pill-row"><span class="layer-pill-name"><i class="fas fa-map-marked-alt layer-ico osm"></i> OpenStreetMap Standard</span><span class="layer-pill-badge">OpenStreetMap</span></div>',
+              layer: layer_OSM_Standard,
+            },
+            {
+              label:
+                '<div class="layer-pill-row"><span class="layer-pill-name"><i class="fas fa-satellite layer-ico esri"></i> Esri World Satellite</span><span class="layer-pill-badge">High-Res</span></div>',
+              layer: layer_EsriImagery,
+            },
+            {
+              label:
+                '<div class="layer-pill-row"><span class="layer-pill-name"><i class="fas fa-mountain layer-ico topo"></i> Esri Topographic</span><span class="layer-pill-badge">Terrain</span></div>',
+              layer: layer_EsriTopo,
+            },
+            {
+              label:
+                '<div class="layer-pill-row"><span class="layer-pill-name"><i class="fas fa-globe-africa layer-ico osm"></i> OSM International</span><span class="layer-pill-badge">Wikimedia</span></div>',
+              layer: layer_OSM_Wikimedia,
+            },
+            {
+              label:
+                '<div class="layer-pill-row"><span class="layer-pill-name"><i class="fas fa-road layer-ico street"></i> Esri World Streets</span><span class="layer-pill-badge">Urban</span></div>',
+              layer: layer_EsriStreet,
+            },
+          ],
+        },
+      ];
+
+      var overlaysTree = [
+        {
+          label:
+            '<div class="tree-category-row"><span class="tree-category-title"><i class="fas fa-draw-polygon"></i> BOUNDARIES</span><span class="tree-badge">Vector Overlays</span></div>',
+          selectAllCheckbox: true,
+          children: [
+            {
+              label:
+                '<div class="layer-pill-row"><span class="layer-pill-name"><i class="fas fa-shield-alt layer-ico national"></i> National Boundary</span><span class="layer-pill-tag glow">Glow Line</span></div>',
+              layer: layer_NigeriaBoundary_4,
+            },
+            {
+              label:
+                '<div class="layer-pill-row"><span class="layer-pill-name"><i class="fas fa-landmark layer-ico states"></i> State Boundaries</span><span class="layer-pill-tag">37 States</span></div>',
+              layer: layer_NigeriaStates_3,
+            },
+            {
+              label:
+                '<div class="layer-pill-row"><span class="layer-pill-name"><i class="fas fa-th-large layer-ico lga"></i> LGA Boundaries</span><span class="layer-pill-tag">774 LGAs</span></div>',
+              layer: layer_NigeriaLGA_2,
+            },
+          ],
+        },
+      ];
+
+      // Layer control — hover-to-expand widget matching the measure control style
+      var layerControl = L.control.layers.tree(baseTree, overlaysTree, {
+        position: "topright",
+        collapsed: true, // start collapsed; CSS hover handles expansion
+      });
+      layerControl.addTo(map);
+
+      // Inject the compact icon trigger button that sits inside .leaflet-control-layers
+      var layerContainer = layerControl.getContainer();
+      if (layerContainer) {
+        // Wrap the inner form so we can animate only it
+        var innerForm = layerContainer.querySelector("form");
+        if (innerForm) {
+          innerForm.classList.add("layers-dropdown-form");
+        }
+
+        // Build the always-visible icon button (mirrors .leaflet-bar-part aesthetics)
+        var triggerBtn = document.createElement("a");
+        triggerBtn.className = "leaflet-bar-part layers-trigger-btn";
+        triggerBtn.title = "Map Layers";
+        triggerBtn.href = "#";
+        triggerBtn.innerHTML =
+          '<i class="fas fa-layer-group"></i><span class="layers-trigger-label">Layers</span>';
+        triggerBtn.addEventListener("click", function (e) {
+          e.preventDefault();
+        });
+        layerContainer.insertBefore(triggerBtn, layerContainer.firstChild);
+
+        // Track active-layer count as badge on the button
+        function updateActiveCount() {
+          var n = layerContainer.querySelectorAll("input:checked").length;
+          var badge = layerContainer.querySelector(".layers-active-badge");
+          if (!badge) {
+            badge = document.createElement("span");
+            badge.className = "layers-active-badge";
+            triggerBtn.appendChild(badge);
+          }
+          badge.textContent = n;
+        }
+        layerContainer.addEventListener("change", updateActiveCount);
+        setTimeout(updateActiveCount, 250);
+      }
+    </script>
+
+    <!-- Live Telemetry Dashboard Application Engine -->
+    <script src="js/dashboard-app.js"></script>
+  </body>
+</html>
