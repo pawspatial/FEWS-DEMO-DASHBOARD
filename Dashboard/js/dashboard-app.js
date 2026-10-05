@@ -91,12 +91,16 @@ function setupEventListeners() {
       const isMobile = window.matchMedia("(max-width: 768px)").matches;
       const sidebarClass = isMobile ? "open" : "collapsed";
       sidebar.classList.toggle(sidebarClass);
+      const isExpanded = isMobile
+        ? sidebar.classList.contains("open")
+        : !sidebar.classList.contains("collapsed");
       toggleSidebarBtn.classList.toggle(
         "active",
         sidebar.classList.contains(
           sidebarClass === "open" ? "open" : "collapsed",
         ),
       );
+      toggleSidebarBtn.setAttribute("aria-expanded", String(isExpanded));
       setTimeout(() => {
         if (typeof map !== "undefined") map.invalidateSize();
       }, 350);
@@ -707,6 +711,15 @@ function selectStation(stationId, flyToMap = true) {
   const card = document.getElementById(`card-${stationId}`);
   if (card) {
     card.scrollIntoView({ behavior: "smooth", block: "nearest" });
+  }
+
+  if (flyToMap && window.matchMedia("(max-width: 768px)").matches) {
+    document.getElementById("dashSidebar")?.classList.remove("open");
+    const sidebarButton = document.getElementById("toggleSidebarBtn");
+    if (sidebarButton) {
+      sidebarButton.classList.remove("active");
+      sidebarButton.setAttribute("aria-expanded", "false");
+    }
   }
 
   // Focus on map

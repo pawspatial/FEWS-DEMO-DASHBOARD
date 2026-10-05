@@ -3681,23 +3681,88 @@ body,
 @media (max-width: 480px) {
   .leaflet-popup-content,
   .leaflet-popup-content-wrapper {
-    max-width: calc(100vw - 48px) !important;
+    max-width: min(320px, calc(100vw - 48px)) !important;
   }
+
   .popup-header {
-    padding: 12px 13px 9px;
+    padding: 8px 10px 7px;
   }
+
+  .popup-station-badge {
+    margin-bottom: 4px;
+    padding: 3px 6px;
+    font-size: 8px;
+  }
+
+  .popup-header .popup-title {
+    margin-bottom: 3px;
+    font-size: 13px;
+  }
+
+  .popup-coords {
+    font-size: 8px;
+  }
+
   .popup-hero-temp-row {
-    padding: 10px 13px;
+    padding: 7px 10px;
   }
+
+  .popup-temp-large {
+    font-size: 24px;
+  }
+
+  .popup-feels-like {
+    margin-top: 3px;
+    font-size: 9px;
+  }
+
+  .popup-weather-status-icon {
+    width: 32px;
+    height: 32px;
+    font-size: 14px;
+  }
+
   .popup-grid {
-    padding: 10px 11px;
-    gap: 6px;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 4px;
+    padding: 7px 8px;
   }
+
   .popup-metric-item {
-    padding: 7px;
+    padding: 6px 5px;
   }
+
+  .popup-metric-label {
+    gap: 3px;
+    margin-bottom: 3px;
+    font-size: 7px;
+  }
+
+  .popup-metric-val {
+    font-size: 9px;
+    line-height: 1.2;
+    white-space: normal;
+    overflow-wrap: anywhere;
+  }
+
+  .popup-metric-val span {
+    font-size: 8px !important;
+  }
+
   .popup-footer {
-    padding: 8px 10px;
+    gap: 5px;
+    padding: 6px 8px;
+    font-size: 8px;
+  }
+
+  .popup-footer > span {
+    white-space: normal;
+  }
+
+  .popup-sync-btn {
+    gap: 3px;
+    padding: 4px 5px;
+    font-size: 8px;
   }
 }
 
@@ -4020,5 +4085,620 @@ body,
     padding: 8px 6px;
     white-space: normal;
     text-align: center;
+  }
+}
+
+@media (max-width: 768px) {
+  html,
+  body {
+    height: auto;
+    min-height: 100%;
+    overflow-x: hidden;
+    overflow-y: auto;
+  }
+
+  #dashboard-root {
+    height: auto;
+    min-height: 100vh;
+    min-height: 100dvh;
+  }
+
+  .dash-header {
+    position: sticky;
+    top: 0;
+    display: grid;
+    grid-template-columns: minmax(0, 1fr);
+    height: auto;
+    min-height: 0;
+    flex: 0 0 auto;
+    gap: 7px;
+    padding: 8px 10px;
+  }
+
+  #toggleSidebarBtn {
+    display: none;
+  }
+
+  .brand-section {
+    width: 100%;
+    gap: 8px;
+  }
+
+  .brand-icon-wrapper {
+    width: 32px;
+    height: 32px;
+    flex: 0 0 32px;
+  }
+
+  .brand-titles {
+    flex: 1 1 auto;
+  }
+
+  .brand-title {
+    flex-wrap: wrap;
+    gap: 4px;
+    font-size: 12px;
+    line-height: 1.25;
+  }
+
+  .brand-subtitle {
+    max-width: 100%;
+    font-size: 8px;
+    line-height: 1.3;
+    white-space: normal;
+  }
+
+  .badge {
+    padding: 2px 5px;
+    font-size: 8px;
+  }
+
+  .telemetry-status-wrapper {
+    display: flex;
+    width: 100%;
+    flex-wrap: wrap;
+    gap: 5px 10px;
+    padding-left: 40px;
+  }
+
+  .live-beacon-pill {
+    padding: 4px 7px;
+    font-size: 8px;
+  }
+
+  .sync-timer-label {
+    display: inline-flex;
+    font-size: 9px;
+  }
+
+  .header-actions {
+    display: grid;
+    width: 100%;
+    grid-template-columns: repeat(5, minmax(0, 1fr));
+    gap: 5px;
+    margin: 0;
+  }
+
+  .header-actions .hud-btn,
+  .header-actions .hud-btn:nth-child(n + 4) {
+    display: inline-flex;
+    width: 100%;
+    min-width: 0;
+    height: 36px;
+    padding: 0;
+  }
+
+  .header-actions .hud-btn span {
+    display: none;
+  }
+
+  .dash-body {
+    display: flex;
+    flex: 0 0 auto;
+    flex-direction: column;
+    overflow: visible;
+  }
+
+  .dash-sidebar,
+  .dash-sidebar.collapsed,
+  .dash-sidebar.open {
+    position: static;
+    inset: auto;
+    order: 1;
+    width: 100%;
+    min-width: 0;
+    max-height: none;
+    overflow: visible;
+    transform: none;
+    border-right: 0;
+    border-bottom: 1px solid rgba(137, 168, 200, 0.16);
+    box-shadow: none;
+    transition: none;
+  }
+
+  .sidebar-header {
+    padding: 12px 12px 10px;
+  }
+
+  .sidebar-title-row {
+    margin-bottom: 8px;
+  }
+
+  .station-search-input {
+    min-height: 38px;
+  }
+
+  .filter-chips {
+    flex-wrap: wrap;
+    gap: 6px;
+  }
+
+  .filter-chip {
+    min-height: 30px;
+    padding: 5px 7px;
+    font-size: 9px;
+  }
+
+  .sidebar-content {
+    display: grid;
+    flex: 0 0 auto;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 7px;
+    overflow: visible;
+    padding: 0 12px 12px;
+  }
+
+  .station-card {
+    min-height: 44px;
+    padding: 8px 9px;
+  }
+
+  .station-card:last-child:nth-child(odd) {
+    grid-column: 1 / -1;
+  }
+
+  .station-card .st-card-title {
+    font-size: 12px;
+    line-height: 1.3;
+    white-space: normal;
+    overflow-wrap: anywhere;
+  }
+
+  .map-viewport {
+    order: 2;
+    display: flex;
+    flex: 0 0 auto;
+    flex-direction: column;
+    width: 100%;
+    height: auto;
+    min-height: 0;
+    overflow: visible;
+  }
+
+  .floating-kpi-bar {
+    position: static;
+    display: grid;
+    flex: 0 0 auto;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 7px;
+    width: 100%;
+    height: auto;
+    overflow: visible;
+    margin: 0;
+    padding: 10px 12px;
+  }
+
+  .kpi-card,
+  .kpi-card:last-child {
+    display: flex;
+    flex: none;
+    width: 100%;
+    min-width: 0;
+    min-height: 62px;
+    gap: 7px;
+    padding: 8px;
+  }
+
+  .kpi-card:last-child:nth-child(odd) {
+    grid-column: 1 / -1;
+  }
+
+  .kpi-icon-box {
+    width: 27px;
+    height: 27px;
+    flex: 0 0 27px;
+  }
+
+  .kpi-label {
+    font-size: 8px;
+    white-space: normal;
+  }
+
+  .kpi-value {
+    font-size: 13px;
+  }
+
+  .kpi-sub {
+    font-size: 8px;
+  }
+
+  #map {
+    width: 100%;
+    height: min(65vh, 560px);
+    min-height: 380px;
+    flex: 0 0 auto;
+  }
+
+  .leaflet-top.leaflet-right {
+    top: 8px !important;
+    right: 8px !important;
+  }
+
+  .analytics-drawer {
+    max-height: calc(100% - 16px);
+    overflow: auto;
+  }
+}
+
+@media (max-width: 768px) {
+  html,
+  body {
+    width: 100%;
+    height: 100%;
+    min-height: 0;
+    overflow: hidden;
+  }
+
+  #dashboard-root {
+    height: 100%;
+    height: 100dvh;
+    min-height: 0;
+    overflow: hidden;
+  }
+
+  .dash-header {
+    position: relative;
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) auto;
+    grid-template-areas:
+      "brand status"
+      "actions actions";
+    align-items: center;
+    height: auto;
+    min-height: 0;
+    flex: 0 0 auto;
+    gap: 6px 8px;
+    padding: 7px 9px;
+  }
+
+  .brand-section {
+    grid-area: brand;
+    width: 100%;
+    gap: 6px;
+  }
+
+  #toggleSidebarBtn {
+    display: inline-flex;
+    width: 30px;
+    height: 32px;
+    flex: 0 0 30px;
+    padding: 0;
+  }
+
+  .brand-icon-wrapper {
+    width: 30px;
+    height: 32px;
+    flex: 0 0 30px;
+  }
+
+  .brand-titles {
+    flex: 1 1 auto;
+  }
+
+  .brand-title {
+    flex-wrap: wrap;
+    gap: 3px;
+    font-size: 10px;
+    line-height: 1.15;
+  }
+
+  .brand-subtitle {
+    max-width: 100%;
+    font-size: 7px;
+    line-height: 1.2;
+    white-space: normal;
+  }
+
+  .badge {
+    padding: 1px 4px;
+    font-size: 7px;
+  }
+
+  .telemetry-status-wrapper {
+    grid-area: status;
+    display: flex;
+    min-width: 0;
+    flex-direction: column;
+    align-items: flex-end;
+    gap: 3px;
+  }
+
+  .live-beacon-pill {
+    max-width: 100%;
+    gap: 4px;
+    padding: 4px 6px;
+    font-size: 7px;
+  }
+
+  .beacon-dot {
+    width: 6px;
+    height: 6px;
+  }
+
+  .sync-timer-label {
+    display: none;
+  }
+
+  .header-actions {
+    grid-area: actions;
+    display: grid;
+    width: 100%;
+    grid-template-columns: repeat(5, minmax(0, 1fr));
+    gap: 5px;
+    margin: 0;
+  }
+
+  .header-actions .hud-btn {
+    display: inline-flex;
+    width: 100%;
+    min-width: 0;
+    height: 32px;
+    padding: 0;
+  }
+
+  .header-actions .hud-btn span {
+    display: none;
+  }
+
+  .dash-body {
+    position: relative;
+    display: block;
+    flex: 1 1 auto;
+    min-height: 0;
+    overflow: hidden;
+  }
+
+  .map-viewport {
+    position: absolute;
+    inset: 0;
+    display: block;
+    width: 100%;
+    height: 100%;
+    min-height: 0;
+    overflow: hidden;
+  }
+
+  #map {
+    position: absolute;
+    inset: 0;
+    width: 100%;
+    height: 100%;
+    min-height: 0;
+  }
+
+  .dash-sidebar,
+  .dash-sidebar.collapsed,
+  .dash-sidebar.open {
+    position: absolute;
+    inset: 0 auto 0 0;
+    z-index: 900;
+    display: flex;
+    width: min(320px, calc(100vw - 48px));
+    min-width: 0;
+    max-height: none;
+    overflow: hidden;
+    transform: translateX(-105%);
+    border-right: 1px solid rgba(137, 168, 200, 0.2);
+    border-bottom: 0;
+    box-shadow: 12px 0 30px rgba(0, 0, 0, 0.42);
+    transition: transform 220ms ease;
+  }
+
+  .dash-sidebar.open {
+    transform: translateX(0);
+  }
+
+  .sidebar-header {
+    flex: 0 0 auto;
+    padding: 12px 12px 10px;
+  }
+
+  .sidebar-title-row {
+    margin-bottom: 8px;
+  }
+
+  .station-search-input {
+    min-height: 38px;
+  }
+
+  .filter-chips {
+    flex-wrap: wrap;
+    gap: 6px;
+  }
+
+  .filter-chip {
+    min-height: 30px;
+    padding: 5px 7px;
+    font-size: 9px;
+  }
+
+  .sidebar-content {
+    display: flex;
+    flex: 1 1 auto;
+    flex-direction: column;
+    gap: 7px;
+    min-height: 0;
+    overflow-x: hidden;
+    overflow-y: auto;
+    padding: 0 12px 12px;
+  }
+
+  .station-card {
+    flex: 0 0 auto;
+    min-height: 44px;
+    padding: 8px 9px;
+  }
+
+  .station-card .st-card-title {
+    font-size: 12px;
+    line-height: 1.3;
+    white-space: normal;
+    overflow-wrap: anywhere;
+  }
+
+  .floating-kpi-bar {
+    position: absolute;
+    z-index: 600;
+    top: 8px;
+    right: 8px;
+    left: 8px;
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 6px;
+    width: auto;
+    height: auto;
+    overflow: visible;
+    margin: 0;
+    padding: 0;
+  }
+
+  .kpi-card,
+  .kpi-card:last-child {
+    display: flex;
+    flex: none;
+    width: 100%;
+    min-width: 0;
+    min-height: 54px;
+    gap: 6px;
+    padding: 7px;
+  }
+
+  .kpi-card:last-child:nth-child(odd) {
+    grid-column: 1 / -1;
+  }
+
+  .kpi-icon-box {
+    width: 25px;
+    height: 25px;
+    flex: 0 0 25px;
+  }
+
+  .kpi-label {
+    font-size: 7px;
+    white-space: normal;
+  }
+
+  .kpi-value {
+    font-size: 12px;
+  }
+
+  .kpi-sub {
+    font-size: 7px;
+    line-height: 1.15;
+  }
+
+  .leaflet-control-layers {
+    display: block !important;
+    position: relative !important;
+    width: 0 !important;
+    height: 0 !important;
+    margin: 0 !important;
+    padding: 0 !important;
+    border: 0 !important;
+    background: transparent !important;
+    box-shadow: none !important;
+  }
+
+  .layers-trigger-btn {
+    display: none !important;
+  }
+
+  .layers-dropdown-panel {
+    top: 0 !important;
+    right: 0 !important;
+    left: auto !important;
+    width: min(340px, calc(100vw - 16px)) !important;
+    min-width: 0 !important;
+    max-width: calc(100vw - 16px) !important;
+  }
+
+  .tree-category-row {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 6px;
+    width: 100%;
+  }
+
+  .tree-category-title {
+    display: flex;
+    align-items: center;
+    gap: 5px;
+    min-width: 0;
+    color: #dce8f5;
+    font-size: 9px;
+    font-weight: 700;
+  }
+
+  .tree-badge {
+    flex: 0 0 auto;
+    padding: 2px 4px;
+    border-radius: 4px;
+    background: rgba(0, 225, 255, 0.1);
+    color: #85efff;
+    font-size: 7px;
+    white-space: nowrap;
+  }
+
+  .layer-pill-row {
+    align-items: flex-start;
+    gap: 4px;
+  }
+
+  .layer-pill-name {
+    gap: 5px;
+    min-width: 0;
+    font-size: 9px;
+    line-height: 1.2;
+    white-space: normal;
+    overflow-wrap: anywhere;
+  }
+
+  .layer-pill-badge,
+  .layer-pill-tag {
+    flex: 0 0 auto;
+    margin-left: 0;
+    padding: 2px 4px;
+    font-size: 7px;
+    white-space: nowrap;
+  }
+
+  .leaflet-control-layers.is-open .layers-dropdown-panel {
+    max-height: min(70vh, calc(100dvh - 300px)) !important;
+  }
+
+  .leaflet-top.leaflet-right {
+    top: 192px !important;
+    right: 8px !important;
+  }
+}
+
+@media (max-width: 380px) {
+  .telemetry-status-wrapper {
+    display: none;
+  }
+
+  .brand-section {
+    grid-column: 1 / -1;
   }
 }

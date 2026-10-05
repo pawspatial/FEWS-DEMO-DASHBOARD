@@ -19,7 +19,7 @@
     <link rel="stylesheet" href="css/fontawesome-all.min.css" />
     <!-- photon search removed -->
     <link rel="stylesheet" href="css/leaflet-measure.css" />
-    <link rel="stylesheet" href="css/dashboard-pro.css" />
+    <link rel="stylesheet" href="css/dashboard-pro.css?v=map-layers-phone-2" />
 
     <!-- Chart.js for Telemetry Analytics -->
     <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
@@ -36,6 +36,7 @@
             class="hud-btn"
             id="toggleSidebarBtn"
             title="Toggle Station Explorer"
+            aria-expanded="false"
           >
             <i class="fas fa-bars"></i>
           </button>
@@ -99,7 +100,7 @@
             title="Toggle Map Layers Panel"
             aria-expanded="false"
           >
-            <i class="fas fa-layer-group" style="color: var(--accent-cyan)"></i>
+            <i class="fas fa-map" style="color: var(--accent-cyan)"></i>
             <span>Map Layers</span>
           </button>
           <button
@@ -107,7 +108,7 @@
             id="exportGeoJsonBtn"
             title="Download updated GeoJSON"
           >
-            <i class="fas fa-file-download"></i>
+            <i class="fas fa-download"></i>
             <span>Export Data</span>
           </button>
         </div>
@@ -625,6 +626,6 @@
 
     <!-- Live Telemetry Dashboard Application Engine -->
     <script src="https://cdn.jsdelivr.net/npm/jspdf@2.5.2/dist/jspdf.umd.min.js"></script>
-    <script src="js/dashboard-app.js?v=phone-report-fit-1"></script>
+    <script src="js/dashboard-app.js?v=map-first-mobile-1"></script>
   </body>
 </html>
